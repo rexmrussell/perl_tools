@@ -1,0 +1,27 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+use CGI ':standard';
+use CGI::Carp qw(fatalsToBrowser);
+
+my $fromemail = 'me@email.com';
+my $emailaddress = 'you@gmail.com'; 
+my $message = 'Dear You,
+Thank you very much :-)';
+
+my $subject='Just a friendly reminder';
+my ($from, $to);
+open(MAIL, "|/usr/sbin/sendmail -t");
+ 
+## Mail Header
+print MAIL "To: $emailaddress\n";
+print MAIL "From: $fromemail\n";
+print MAIL "Subject: $subject\n\n";
+## Mail Body
+print MAIL "\n $message\n";
+ 
+close(MAIL);
+
+
+1;
