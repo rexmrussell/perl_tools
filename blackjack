@@ -1,0 +1,114 @@
+#!/usr/bin/perl -w
+use strict;
+use List::Util qw(first max maxstr min minstr reduce shuffle sum);
+
+system("clear");
+    my (@me,$me,$money, $dcard, @value, %value, @hand, $points1, $points2, $dpoints1, $dpoints2, $card1, $card2, $dcard1, $dcard2, $deck, @deck, %deck, $entire_hand, $input, $sum, $count, $first_num, $second_num, $bet, $card_values, %card_values, @cards, $hand, $cards, $points, @entire_hand,);
+$money=200;
+    while ($money > 0) {
+    $sum=0;
+    $input='Y';
+    &draw_card;
+    push(@me, $card1);
+    push(@me, $card2);
+    print "The dealer drew a $dcard1 which is worth $dpoints1, and your first card is a $card1 which is worth $points1\n"; 
+    print "You have \$$money. How much of it would you like to bet? \n";
+    $bet = <STDIN>;
+    $bet =~ s/\$//;
+
+    if ($bet > $money) {
+        print "Hey DUMBASS, you only have \$$money to bet! \n";
+        $bet = $money;
+    }
+
+    print "You bet \$$bet dollars. \n\n";
+    $count=0;
+    $sum=0;
+    print "Your second card is $card2 with a value of $points2\n";
+    $sum = $points1 + $points2;
+    print "You now have a total of $sum points \n";
+    print "Do you want to draw again? \n";
+    chomp ($input = <STDIN>);
+    if ($input eq "n" || $input eq "N" || $sum >= 21) {$count='1';}
+
+    while ($count eq '0'){
+        &draw_card();
+        $hand=pop(@hand);
+        push(@me, $hand);
+        $points=$deck{"$hand"};
+        $sum +=$points;
+        
+        print "You drew the $hand which has a value of $points. You now have $sum points \n";
+
+        if ($sum > 21) {
+            $money -= $bet;
+            system ("clear");
+            print "YOU LOSE!!! \n";
+        }
+
+        if ($sum < 21) {print "Again?\n";
+            chomp ($input = <STDIN>);}
+
+        if ($input eq "n" || $input eq "N" || $sum >= 21) {$count='1';} 
+
+    }
+
+    if ($sum eq 21) {
+        $money += $bet;
+        system ("clear");
+        print "YOU WIN!!! \n";
+    }
+    
+    $second_num=($dpoints1+$dpoints2);
+    push (@entire_hand, $dcard1);
+    push (@entire_hand, $dcard2);
+    while ($second_num < 15) {
+        &draw_card();
+        $dcard=pop(@hand);
+        my $point=$deck{"$dcard"}; 
+        $second_num += $point;
+        push (@entire_hand, $dcard);
+    }
+   
+    $entire_hand = join(', ', @entire_hand);
+    $me = join(', ', @me);
+
+    if (($sum > $second_num || $second_num > 21) && $sum < 21) {
+        $money += $bet;
+        system ("clear");
+        print "You win \n";
+        }
+
+    if ($sum < $second_num && $second_num <= 21) {
+        $money -= $bet;
+        system ("clear");
+        print "You lose \n"   
+     }
+    print "The dealer ended up with $second_num points and you got $sum points.\n\n";
+    print "The dealers cards were: $entire_hand \n Your cards were $me\n\n";
+    print "You now have \$$money dollars \n\n\n";
+    @entire_hand=();
+    @me=();
+
+
+}
+
+sub draw_card {
+ %deck = map {
+         my $face = $_;
+         my $value = /\d/xms ? $_ : $_ eq 'Ace' ? 11 : 10;
+         map { +"$face of $_" => $value } qw(Clubs Diamonds Hearts Spades)
+     } 2..10, qw(Jack Queen King Ace);
+
+
+@hand = shuffle keys %deck;
+$card1=pop(@hand);
+$card2=pop(@hand);
+$dcard1=pop(@hand);
+$dcard2=pop(@hand);
+$points1=$deck{"$card1"};
+$points2=$deck{"$card2"};
+$dpoints1=$deck{"$dcard1"};
+$dpoints2=$deck{"$dcard2"};
+return @hand && $points1 && $points2 && $card1 && $card2, $dcard1, $dcard2, $dpoints1, $dpoints2;
+}
