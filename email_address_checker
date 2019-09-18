@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+
+use threads;
+use strict;
+use warnings;
+use Mail::CheckUser qw(check_email last_check);
+								
+my $elapsed;
+my $url;
+
+
+my $pkg = bless {}, __PACKAGE__;
+$pkg->main();
+
+sub main {
+   my $self = shift;
+   my $file = "emails.txt";
+# Slurp in file in one shot
+   my $text = do { local( @ARGV, $/ ) = $file ; <> };
+   open my $OUTFH, '>>', "mail_output.txt" || die $!;
+   foreach my $email(split("\n", $text)) {
+
+chop $email;
+if(check_email($email)) {
+    print "E-mail address <$email> is OK\n";
+    open my $OUTFH, '>>', "mail_output.txt" || die $!;
+    print $OUTFH "Good $email \n";
+    close $OUTFH;
+    }
+    
+           #print "$query $elapsed  \n";
+    }
+    
+}
+
+print "Your all done! \n";
